@@ -10,7 +10,8 @@
   "dependencies": {
     "jquery": "^3.4.1",
     "materialize-css": "^1.0.0",
-    "placeload.js": "^1.0.4"
+    "placeload.js": "^1.0.4",
+    "europeanamediaplayer": "^0.3.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
