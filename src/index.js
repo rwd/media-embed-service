@@ -2,18 +2,20 @@ import Placeload from 'placeload.js'
 
 import 'materialize-css/dist/css/materialize.min.css';
 import 'materialize-css/dist/js/materialize.min.js';
+import './index.scss';
 
+const embedHost = 'https://embd.eu/api/embed/';
 const EuropeanaMediaPlayer = require("europeanamediaplayer").default;
 
-//var options = {embedid: "6FFlHN"}; 
+//var options = {embedid: "6FFlHN"};
 //var options = {embedid: "WZpDVT"};
 //var options = {embedid: "qBUhte"};
 //var options = {embedid: "6BGMFG"};
 var options = {embedid: "Y1pbs4"};
 var manifest;
 var manifests = [];
-var width;
-var height;
+var embedWidth;
+var embedHeight;
 var videoLoader;
 var player;
 var manifestJsonld = {};
@@ -22,7 +24,6 @@ var subtitles = {};
 var currentMediaItem = 1;
 var timeupdate;
 var videoLoaderActive = false;
-var tabsInstance;
 var start = 0;
 var duration = -1;
 
@@ -45,10 +46,9 @@ window.addEventListener('load', () => {
 });
 
 function getEmbedInfo() {
-  let link = "https://embd.eu/api/embed/"+options.embedid;
-
+  let link = `${embedHost}${options.embedid}`;
   fetch(
-      link, { 
+      link, {
           method: 'GET',
           mode: 'cors',
           headers: { "Content-Type": "application/json; charset=utf-8" }
@@ -61,8 +61,8 @@ function getEmbedInfo() {
       } else {
         manifest = response.videoid;
       }
-      width = response.width;
-      height = response.height;
+      embedWidth = response.width;
+      embedHeight = response.height;
 
       loadVideo();
 
@@ -74,24 +74,24 @@ function getEmbedInfo() {
 }
 
 function loadVideo() {
-  $(".content-wrapper").css({"width": width});
-  $(".player-wrapper").css({"width": width, "height": height});
+  $(".player-wrapper").css({"max-width": embedWidth + 'px', "max-height": embedHeight + 'px' });
+  $(".aspect-ratio").width(embedWidth);
 
   videoLoaderActive = true;
 
-  if ($(".content-wrapper").width() > 700) {
+  if ($(".player-wrapper").width() > 700) {
     videoLoader = Placeload
       .$('.place-loader')
       .config({speed: '1s'})
-      .line((element) => element.width(width).height(height))
+      .line((element) => element.width(embedWidth).height(embedHeight))
       .config({spaceBetween: '30px'})
       .line((element) => element.width(45).height(20))
       .config({spaceBetween: '13px'})
-      .line((element) => element.width(width).height(20))
+      .line((element) => element.width(embedWidth).height(20))
       .config({spaceBetween: '7px'})
-      .line((element) => element.width(width).height(20))
+      .line((element) => element.width(embedWidth).height(20))
       .config({spaceBetween: '7px'})
-      .line((element) => element.width(width).height(20))
+      .line((element) => element.width(embedWidth).height(20))
       .fold(
         err => console.log('error: ', err),
         allElements => {}
@@ -100,17 +100,17 @@ function loadVideo() {
     videoLoader = Placeload
       .$('.place-loader')
       .config({speed: '1s'})
-      .line((element) => element.width(width).height(height))
+      .line((element) => element.width(embedWidth).height(embedHeight))
       .config({spaceBetween: '10px'})
       .line((element) => element.width(80).height(30))
       .config({spaceBetween: '13px'})
       .line((element) => element.width(60).height(20))
       .config({spaceBetween: '13px'})
-      .line((element) => element.width(width).height(20))
+      .line((element) => element.width(embedWidth).height(20))
       .config({spaceBetween: '7px'})
-      .line((element) => element.width(width).height(20))
+      .line((element) => element.width(embedWidth).height(20))
       .config({spaceBetween: '7px'})
-      .line((element) => element.width(width).height(20))
+      .line((element) => element.width(embedWidth).height(20))
       .fold(
         err => console.log('error: ', err),
         allElements => {}
@@ -118,16 +118,14 @@ function loadVideo() {
   }
 
   if (options.temporal) {
-    manifest = "https://embd.eu/api/embed/"+options.embedid+"/t/"+options.temporal;
+    manifest = `${embedHost}${options.embedid}/t/${options.temporal}`;
   }
 
   let vObj = {manifest: manifest};
   let opt = {mode: "player"};
   opt.manifest = manifest;
 
-  getAnnotations();
-
-  setTimeout(function() { 
+  setTimeout(function() {
     let p = new EuropeanaMediaPlayer($(".player-wrapper"), vObj, opt);
     player = p.player;
 
@@ -137,39 +135,6 @@ function loadVideo() {
 
     player.avcomponent.on('mediaready', function() {
       initializeEmbed();
-      /*videoLoader.remove();
-      $(".player-wrapper").show();
-
-      getSubtitles();
-
-      manifestJsonld = player.manifest.__jsonld;
-      manifestMetadata = manifestJsonld.metaData;
-  
-      if ($(".content-wrapper").width() > 700) {
-        $(".widecolumn").each(function() {
-          $(this).removeClass("smallrow");
-        })
-        $(".widecolumn").show();
-      } else {
-        $(".smallrow").each(function() {
-          $(this).removeClass("widecolumn");
-        });
-        $(".smallrow").show();
-
-        let tabs = document.querySelectorAll('.tabs')[0];
-        let tabOptions = {duration: 300}
-        let tabsInstance = M.Tabs.init(tabs, tabOptions);
-
-        var hash = window.location.hash;
-        if (hash.length > 1) {
-          hash = hash.indexOf("?") > -1 ? hash.substring(0, hash.indexOf("?")) : hash;
-          tabsInstance.select(hash.substr(1));
-        }
-      }
-
-      let langCode = manifestMetadata.find(obj => obj.label.en[0] == "language").value[Object.keys(manifestMetadata.find(obj => obj.label.en[0] == "language").value)[0]][0];
-      $(".video-title").text(manifestJsonld.label[Object.keys(manifestJsonld.label)[0]]);
-      $(".video-description").text(manifestJsonld.description[Object.keys(manifestJsonld.description)[0]]);*/
     });
   }, 500);
 }
@@ -198,25 +163,12 @@ function initializeEmbed() {
       $(this).removeClass("widecolumn");
     });
     $(".smallrow").show();
-
-
-    let tabs = document.querySelectorAll('.tabs')[0];
-    let tabOptions = {duration: 300}
-    tabsInstance = M.Tabs.init(tabs, tabOptions);
-
-    var hash = window.location.hash;
-    if (hash.length > 1) {
-      hash = hash.indexOf("?") > -1 ? hash.substring(0, hash.indexOf("?")) : hash;
-      tabsInstance.select(hash.substr(1));
-    } else {
-       tabsInstance.select("metadata");
-    }
   }
 
   //let langCode = manifestMetadata.find(obj => obj.label.en[0] == "language").value[Object.keys(manifestMetadata.find(obj => obj.label.en[0] == "language").value)[0]][0];
   if (manifestJsonld.label) {
     $(".video-title").text(manifestJsonld.label[Object.keys(manifestJsonld.label)[0]]);
-  } 
+  }
   if (manifestJsonld.description) {
     $(".video-description").text(manifestJsonld.description[Object.keys(manifestJsonld.description)[0]]);
   }
@@ -226,49 +178,15 @@ function initializeEmbed() {
   }
 }
 
-function getAnnotations() {
-  let link = "https://embd.eu/api/embed/"+options.embedid+"/annotations";
-
-  if (options.temporal) {
-    link = "https://embd.eu/api/embed/"+options.embedid+"/annotations/t/"+options.temporal;
-  }
-
-  fetch(
-      link, { 
-          method: 'GET',
-          mode: 'cors',
-          headers: { "Content-Type": "application/json; charset=utf-8" }
-      })
-  .then(res => res.json())
-  .then(response => {
-      let   annotations = response;
-      annotations.forEach(function(annotation) {
-        addAnnotation(annotation);
-      });
-  })
-  .catch(err => {
-      console.error("Could not retrieve annotations");
-      console.log(err);
-  });
-}
-
-function addAnnotation(annotation) {
-  $(".annotations").append("<div class='row annotation-row' data-start='"+annotation.start+"'><div class='annotation-timing col s4'>"+formatTime(annotation.start)+" - "+formatTime(annotation.end)+"</div><div class='annotation-text col s8'><span class='annotation-text-inline'>"+annotation.text+"</span></div></div>");
-
-  $(".annotation-row").on("click", function() {
-    player.avcomponent.setCurrentTime(($(this).data("start") / 1000));
-  });
-}
-
 function getSubtitles() {
-  let link = "https://embd.eu/api/embed/"+options.embedid+"/subtitles";
+  let link = `${embedHost}${options.embedid}/subtitles`
 
   if (options.temporal) {
-    link = "https://embd.eu/api/embed/"+options.embedid+"/subtitles/t/"+options.temporal;
+    link += `/t/${options.temporal}`;
   }
 
   fetch(
-      link, { 
+      link, {
           method: 'GET',
           mode: 'cors',
           headers: { "Content-Type": "application/json; charset=utf-8" }
@@ -310,9 +228,8 @@ function mediaHasEnded(ended) {
     manifest = manifests[currentMediaItem].vid;
     currentMediaItem++;
 
-    //clear 
+    //clear
     $("#embed-player").empty();
-    $(".annotations").empty();
 
     let vObj = {manifest: manifest};
     let opt = {mode: "player"};
@@ -413,7 +330,7 @@ function formatTime(time, millis = false, threeDigitMillis = false) {
   if (millis) {
     let milliseconds = threeDigitMillis ? Math.floor(time % 1000) : Math.floor((time % 1000) / 10);
     if (threeDigitMillis) {
-      if (milliseconds < 10) { 
+      if (milliseconds < 10) {
         timestring += ".00" + milliseconds;
       } else if (milliseconds < 100) {
         timestring += ".0" + milliseconds;
@@ -431,4 +348,3 @@ function formatTime(time, millis = false, threeDigitMillis = false) {
 
   return timestring;
 }
-
