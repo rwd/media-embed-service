@@ -1,6 +1,5 @@
 const path = require('path')
 var webpack = require('webpack')
-var MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 process.env.EMVE_PORT = process.env.EMVE_PORT || 9001
@@ -10,41 +9,30 @@ const config = function (mode) {
         mode: mode,
         entry: ['./src/index.js'],
         module: {
-            rules: [
-            {
-                test: /\.js$/,
-                exclude: /(node_modules|bower_components)/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: ['env']
-                    }
-                }
-            },
-            {
-                test: /\.html$/,
-                exclude: /(node_modules|bower_components)/,
-                use: {
-                    loader: 'html-loader',
-                    options: {}
-                }
-            },
-            {
-              test: /\.[s]?css$/,
-              use: [
-                'style-loader',
-                //MiniCssExtractPlugin.loader,
-                {
-                  loader: 'css-loader',
-                  options: {
-                    sourceMap: true,
+          rules: [
+              {
+                  test: /\.js$/,
+                  exclude: /(node_modules|bower_components)/,
+                  use: {
+                      loader: 'babel-loader',
+                      options: {
+                        presets: ['es2015']
+                      },
                   }
-                },
-                { loader: 'sass-loader', options: { sourceMap: true } }
-              ],
-
-            },
-        ]
+              },
+              {
+                  test: /\.html$/,
+                  exclude: /(node_modules|bower_components)/,
+                  use: {
+                      loader: 'html-loader',
+                      options: {}
+                  }
+              },
+              {
+                test: /\.css$/,
+                use: ['style-loader', 'css-loader'],
+              }
+          ]
         },
         output: {
             path: path.resolve(__dirname, 'public/bundle/'),
@@ -71,11 +59,8 @@ const config = function (mode) {
     if (mode === 'development') {
         conf.plugins.push(new webpack.HotModuleReplacementPlugin())
         conf.plugins.push(new webpack.NoEmitOnErrorsPlugin())
-        conf.plugins.push(new MiniCssExtractPlugin({
-          filename: "[name].css",
-          chunkFilename: "[id].css"
-        }))
     }
+
     return conf
 }
 

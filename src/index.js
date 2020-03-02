@@ -1,8 +1,5 @@
-import Placeload from 'placeload.js'
-
-import 'materialize-css/dist/css/materialize.min.css';
-import 'materialize-css/dist/js/materialize.min.js';
-import './index.scss';
+//import 'materialize-css/dist/css/materialize.min.css';
+//import 'materialize-css/dist/js/materialize.min.js';
 
 const embedHost = 'https://embd.eu/api/embed/';
 const EuropeanaMediaPlayer = require("europeanamediaplayer").default;
@@ -16,16 +13,15 @@ var manifest;
 var manifests = [];
 var embedWidth;
 var embedHeight;
-var videoLoader;
 var player;
 var manifestJsonld = {};
 var manifestMetadata = {};
 var subtitles = {};
 var currentMediaItem = 1;
 var timeupdate;
-var videoLoaderActive = false;
 var start = 0;
 var duration = -1;
+var playing = false;
 
 window.addEventListener('load', () => {
   if (window.location.pathname.length > 1) {
@@ -77,46 +73,6 @@ function loadVideo() {
   $(".player-wrapper").css({"max-width": embedWidth + 'px', "max-height": embedHeight + 'px' });
   $(".aspect-ratio").width(embedWidth);
 
-  videoLoaderActive = true;
-
-  if ($(".player-wrapper").width() > 700) {
-    videoLoader = Placeload
-      .$('.place-loader')
-      .config({speed: '1s'})
-      .line((element) => element.width(embedWidth).height(embedHeight))
-      .config({spaceBetween: '30px'})
-      .line((element) => element.width(45).height(20))
-      .config({spaceBetween: '13px'})
-      .line((element) => element.width(embedWidth).height(20))
-      .config({spaceBetween: '7px'})
-      .line((element) => element.width(embedWidth).height(20))
-      .config({spaceBetween: '7px'})
-      .line((element) => element.width(embedWidth).height(20))
-      .fold(
-        err => console.log('error: ', err),
-        allElements => {}
-      );
-  } else {
-    videoLoader = Placeload
-      .$('.place-loader')
-      .config({speed: '1s'})
-      .line((element) => element.width(embedWidth).height(embedHeight))
-      .config({spaceBetween: '10px'})
-      .line((element) => element.width(80).height(30))
-      .config({spaceBetween: '13px'})
-      .line((element) => element.width(60).height(20))
-      .config({spaceBetween: '13px'})
-      .line((element) => element.width(embedWidth).height(20))
-      .config({spaceBetween: '7px'})
-      .line((element) => element.width(embedWidth).height(20))
-      .config({spaceBetween: '7px'})
-      .line((element) => element.width(embedWidth).height(20))
-      .fold(
-        err => console.log('error: ', err),
-        allElements => {}
-      );
-  }
-
   if (options.temporal) {
     manifest = `${embedHost}${options.embedid}/t/${options.temporal}`;
   }
@@ -126,7 +82,7 @@ function loadVideo() {
   opt.manifest = manifest;
 
   setTimeout(function() {
-    let p = new EuropeanaMediaPlayer($(".player-wrapper"), vObj, opt);
+    let p = new EuropeanaMediaPlayer($('.player-wrapper'), vObj, opt);
     player = p.player;
 
     player.avcomponent.on('mediaerror', function() {
@@ -136,15 +92,22 @@ function loadVideo() {
     player.avcomponent.on('mediaready', function() {
       initializeEmbed();
     });
-  }, 500);
+
+    player.avcomponent.on('play', function() {
+      playing = true;
+      $('.player-wrapper').addClass('playing');
+    });
+
+    player.avcomponent.on('pause', function() {
+      playing = false;
+      $('.player-wrapper').removeClass('playing');
+    });
+
+  }, 50);
 }
 
 function initializeEmbed() {
-  if (videoLoaderActive) {
-    videoLoader.remove();
-    videoLoaderActive = false;
-  }
-  $(".player-wrapper").show();
+  $('.player-wrapper').removeClass('loading');
 
   timeupdate = setInterval(() => mediaHasEnded(player.hasEnded()), 50);
 
@@ -153,25 +116,13 @@ function initializeEmbed() {
   manifestJsonld = player.manifest.__jsonld;
   manifestMetadata = manifestJsonld.metaData;
 
-  if ($(".content-wrapper").width() > 700) {
-    $(".widecolumn").each(function() {
-      $(this).removeClass("smallrow");
-    })
-    $(".widecolumn").show();
-  } else {
-    $(".smallrow").each(function() {
-      $(this).removeClass("widecolumn");
-    });
-    $(".smallrow").show();
-  }
-
   //let langCode = manifestMetadata.find(obj => obj.label.en[0] == "language").value[Object.keys(manifestMetadata.find(obj => obj.label.en[0] == "language").value)[0]][0];
   if (manifestJsonld.label) {
     $(".video-title").text(manifestJsonld.label[Object.keys(manifestJsonld.label)[0]]);
   }
-  if (manifestJsonld.description) {
-    $(".video-description").text(manifestJsonld.description[Object.keys(manifestJsonld.description)[0]]);
-  }
+  //if (manifestJsonld.description) {
+  //  $(".video-description").text(manifestJsonld.description[Object.keys(manifestJsonld.description)[0]]);
+  //}
 
   if (duration == -1 && manifestJsonld.items[0].duration) {
      duration = manifestJsonld.items[0].duration;
@@ -248,7 +199,7 @@ function mediaHasEnded(ended) {
   }
 }
 
-function getAllUrlParams(url) {
+export const getAllUrlParams = (url) => {
   // get query string from url (optional) or window
   var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
 
@@ -311,40 +262,9 @@ function getAllUrlParams(url) {
   return obj;
 }
 
-function formatTime(time, millis = false, threeDigitMillis = false) {
-  time = time < 0 ? 0 : time;
+//exports.getAllUrlParams = getAllUrlParams;
+//export { getAllUrlParams };
 
-  let hours = Math.floor(time / 3600000);
-  let minutes = Math.floor(time / 60000);
-  let seconds;
-  if (millis) {
-    seconds = Math.floor((time % 60000) / 1000);
-  } else {
-    seconds = Math.ceil((time % 60000) / 1000);
-  }
-
-  let timestring = hours > 0 ? hours+":" : "";
-  timestring += minutes < 10 ? "0"+minutes+":" : minutes+":";
-  timestring += seconds < 10 ? "0"+seconds : seconds;
-
-  if (millis) {
-    let milliseconds = threeDigitMillis ? Math.floor(time % 1000) : Math.floor((time % 1000) / 10);
-    if (threeDigitMillis) {
-      if (milliseconds < 10) {
-        timestring += ".00" + milliseconds;
-      } else if (milliseconds < 100) {
-        timestring += ".0" + milliseconds;
-      } else {
-        timestring += "." + milliseconds
-      }
-    } else {
-      if (milliseconds < 10) {
-        timestring += ".0" + milliseconds;
-      } else {
-        timestring += "." + milliseconds;
-      }
-    }
-  }
-
-  return timestring;
-}
+//module.exports = {
+//  getAllUrlParams: getAllUrlParams
+//}
