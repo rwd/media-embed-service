@@ -17,8 +17,12 @@ var player;
 var manifestJsonld = {};
 var manifestMetadata = {};
 var subtitles = {};
-var currentMediaItem = 1;
-var timeupdate;
+let currentMediaItem = 1;
+export { currentMediaItem };
+
+let timeUpdate;
+export { timeUpdate };
+
 var start = 0;
 var duration = -1;
 var playing = false;
@@ -106,10 +110,10 @@ function loadVideo() {
   }, 50);
 }
 
-function initializeEmbed() {
+export const initializeEmbed = () => {
   $('.player-wrapper').removeClass('loading');
 
-  timeupdate = setInterval(() => mediaHasEnded(player.hasEnded()), 50);
+  timeUpdate = setInterval(() => mediaHasEnded(player.hasEnded()), 50);
 
   getSubtitles();
 
@@ -173,20 +177,20 @@ function getSubtitles() {
   });
 }
 
-function mediaHasEnded(ended) {
+export const mediaHasEnded = (ended) => {
   if ((ended || player.avcomponent.getCurrentTime() == duration) && currentMediaItem < manifests.length) {
     //load next playlist item
     manifest = manifests[currentMediaItem].vid;
-    currentMediaItem++;
+    currentMediaItem ++;
 
     //clear
-    $("#embed-player").empty();
+    $('.player-wrapper').empty();
 
     let vObj = {manifest: manifest};
     let opt = {mode: "player"};
     opt.manifest = manifest;
 
-    let p = new EuropeanaMediaPlayer($(".player-wrapper"), vObj, opt);
+    let p = new EuropeanaMediaPlayer($('.player-wrapper'), vObj, opt);
     player = p.player;
 
     player.avcomponent.on('mediaerror', function() {
@@ -197,7 +201,7 @@ function mediaHasEnded(ended) {
       initializeEmbed();
     });
   }
-}
+};
 
 export const getAllUrlParams = (url) => {
   // get query string from url (optional) or window
@@ -260,11 +264,4 @@ export const getAllUrlParams = (url) => {
     }
   }
   return obj;
-}
-
-//exports.getAllUrlParams = getAllUrlParams;
-//export { getAllUrlParams };
-
-//module.exports = {
-//  getAllUrlParams: getAllUrlParams
-//}
+};

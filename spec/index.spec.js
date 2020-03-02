@@ -1,18 +1,42 @@
-//import getAllUrlParams from '../src/index';
-//import('../src/index');
-//import * as index from '../src/index';
-import { * } from '../src/index';
+import * as index  from '../src/index';
 
+//var $ = require("jquery");
 
 describe('index functions', () => {
 
-  it('should get the url parameters', () => {
-
-    console.log('index = ' + index);
-    //console.log('getAllUrlParams = ' + getAllUrlParams);
-
-    expect('hello').toBeTruthy();
-    index.getAllUrlParams('http://123');
+  beforeAll(() => {
+    //const fixture = '<div class="player-wrapper loading"></div>';
+    //document.body.insertAdjacentHTML('afterbegin', fixture);
   });
 
+  it('should get the url parameters', () => {
+    let testUrl = 'http://video-embed?t=25,33';
+    let params = index.getAllUrlParams(testUrl);
+    expect(params).toBeTruthy();
+    expect(params.t).toEqual('25,33');
+  });
+
+  it('should increment the currentMediaItem when done', () => {
+    index.currentMediaItem = -1;
+    //expect(index.currentMediaItem).toEqual(0);
+    index.mediaHasEnded(true);
+    //expect(index.currentMediaItem).toEqual(1);
+  });
+
+/*
+  // requires jQuery
+
+  it('should initialise the embed', () => {
+
+    //let wrapperEl = document.querySelector('.player-wrapper');
+    expect(wrapperEl.classList).toContain('loading').
+
+    expect(index.timeUpdate).toBeFalsy();
+
+    index.initializeEmbed();
+
+    expect(index.timeUpdate).not.toBeFalsy();
+    expect(wrapperEl.classList).not.toContain('loading');
+  });
+*/
 });
