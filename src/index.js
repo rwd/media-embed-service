@@ -29,7 +29,7 @@ var duration = -1;
 var playing = false;
 
 window.addEventListener('load', () => {
-  if (window.location.pathname.length > 1) {
+  if (window.location.pathname.length > 1 && window.location.pathname != "/context.html") {
     options.embedid = window.location.pathname.substring(1);
   }
 
@@ -48,6 +48,7 @@ window.addEventListener('load', () => {
 
 function getEmbedInfo() {
   let link = `${embedHost}${options.embedid}`;
+  console.log("link = "+link);
   fetch(
       link, {
           method: 'GET',

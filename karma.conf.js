@@ -3,7 +3,8 @@ module.exports = function (config) {
     basePath: '',
     exclude: [],
     files: [
-      { pattern: 'spec/*.js', watched: true, served: true, included: true }
+      { pattern: 'spec/*.js', watched: true, served: true, included: true },
+      'https://code.jquery.com/jquery-3.4.1.min.js'
     ],
     autoWatch: true,
     singleRun: false,
@@ -29,7 +30,7 @@ module.exports = function (config) {
     captureTimeout: 60000,
 
     client: {
-      captureConsole: false,
+      captureConsole: true,
       clearContext: false,
       jasmine: {
         random: false
@@ -50,8 +51,22 @@ module.exports = function (config) {
             loader: 'babel-loader',
             options: {
               //presets: ['@babel/preset-env']
-              presets: ['babel-preset-es2015']
+              presets: ["babel-preset-es2015"].map(require.resolve)
             }
+          },
+          {
+            test: /\.[s]?css$/,
+            use: [
+              'style-loader',
+              {
+                loader: 'css-loader',
+                options: {
+                  sourceMap: true,
+                }
+              },
+              { loader: 'sass-loader', options: { sourceMap: true } }
+            ],
+
           }
         ]
       }

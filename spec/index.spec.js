@@ -1,12 +1,11 @@
 import * as index  from '../src/index';
 
-//var $ = require("jquery");
-
 describe('index functions', () => {
 
-  beforeAll(() => {
-    //const fixture = '<div class="player-wrapper loading"></div>';
-    //document.body.insertAdjacentHTML('afterbegin', fixture);
+  beforeAll((done) => {
+    const fixture = '<div class="player-wrapper loading"></div>';
+    document.body.insertAdjacentHTML('afterbegin', fixture);
+    setTimeout(done, 3000);
   });
 
   it('should get the url parameters', () => {
@@ -24,23 +23,16 @@ describe('index functions', () => {
   });
 
   // requires jQuery
-
   it('should initialise the embed', () => {
-
-    const fixture = '<div class="player-wrapper loading"></div>';
-    document.body.insertAdjacentHTML('afterbegin', fixture);
-
     let wrapperEl = document.querySelector('.player-wrapper');
+    /*expect(wrapperEl.classList).toContain('loading');
 
-    /*
-    expect(wrapperEl.classList).toContain('loading').
+    expect(index.timeUpdate).toBeFalsy();*/
 
-    expect(index.timeUpdate).toBeFalsy();
-
-    index.initializeEmbed();
+    //index.initializeEmbed();
 
     expect(index.timeUpdate).not.toBeFalsy();
     expect(wrapperEl.classList).not.toContain('loading');
-    */
   });
+
 });
