@@ -1,6 +1,5 @@
 const path = require('path')
 var webpack = require('webpack')
-var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 process.env.EMVE_PORT = process.env.EMVE_PORT || 9001
@@ -33,7 +32,6 @@ const config = function (mode) {
                 test: /\.[s]?css$/,
                 use: [
                   'style-loader',
-                  MiniCssExtractPlugin.loader,
                   {
                     loader: 'css-loader',
                     options: {
@@ -46,20 +44,8 @@ const config = function (mode) {
               }
           ]
         },
-        optimization: {
-            splitChunks: {
-              cacheGroups: {
-                styles: {
-                  name: 'styles',
-                  test: /\.css$/,
-                  chunks: 'all',
-                  enforce: true,
-                },
-              },
-            },
-          },
         output: {
-            path: path.resolve(__dirname, 'public/bundle/'),
+            path: path.resolve(__dirname, 'public/'), 
             filename: 'bundle.js',
             publicPath: '/',
         },
@@ -67,12 +53,6 @@ const config = function (mode) {
             new webpack.ProvidePlugin({
                 $: "jquery"
             }),
-            new MiniCssExtractPlugin({
-                // Options similar to the same options in webpackOptions.output
-                // both options are optional
-                filename: '[name].css',
-                chunkFilename: '[id].css',
-              }),
         ],
         devServer: {
             watchOptions: {
