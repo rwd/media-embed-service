@@ -23,12 +23,16 @@ describe('index functions', () => {
     //expect(index.currentMediaItem).toEqual(1);
   });
 
-/*
   // requires jQuery
 
   it('should initialise the embed', () => {
 
-    //let wrapperEl = document.querySelector('.player-wrapper');
+    const fixture = '<div class="player-wrapper loading"></div>';
+    document.body.insertAdjacentHTML('afterbegin', fixture);
+
+    let wrapperEl = document.querySelector('.player-wrapper');
+
+    /*
     expect(wrapperEl.classList).toContain('loading').
 
     expect(index.timeUpdate).toBeFalsy();
@@ -37,6 +41,6 @@ describe('index functions', () => {
 
     expect(index.timeUpdate).not.toBeFalsy();
     expect(wrapperEl.classList).not.toContain('loading');
+    */
   });
-*/
 });

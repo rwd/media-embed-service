@@ -1,5 +1,6 @@
 //import 'materialize-css/dist/css/materialize.min.css';
 //import 'materialize-css/dist/js/materialize.min.js';
+import './index.scss';
 
 const embedHost = 'https://embd.eu/api/embed/';
 const EuropeanaMediaPlayer = require("europeanamediaplayer").default;

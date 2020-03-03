@@ -1,5 +1,6 @@
 const path = require('path')
 var webpack = require('webpack')
+var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 process.env.EMVE_PORT = process.env.EMVE_PORT || 9001
@@ -29,8 +30,19 @@ const config = function (mode) {
                   }
               },
               {
-                test: /\.css$/,
-                use: ['style-loader', 'css-loader'],
+                test: /\.[s]?css$/,
+                use: [
+                  'style-loader',
+                  //MiniCssExtractPlugin.loader,
+                  {
+                    loader: 'css-loader',
+                    options: {
+                      sourceMap: true,
+                    }
+                  },
+                  { loader: 'sass-loader', options: { sourceMap: true } }
+                ],
+
               }
           ]
         },
@@ -57,8 +69,12 @@ const config = function (mode) {
     }
 
     if (mode === 'development') {
-        conf.plugins.push(new webpack.HotModuleReplacementPlugin())
-        conf.plugins.push(new webpack.NoEmitOnErrorsPlugin())
+        conf.plugins.push(new webpack.HotModuleReplacementPlugin());
+        conf.plugins.push(new webpack.NoEmitOnErrorsPlugin());
+        //conf.plugins.push(new MiniCssExtractPlugin({
+        //  filename: "[name].css",
+        //  chunkFilename: "[id].css"
+        //}))
     }
 
     return conf
