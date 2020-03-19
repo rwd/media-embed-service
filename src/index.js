@@ -40,7 +40,6 @@ window.addEventListener('load', () => {
 
       if(urlParams.width && urlParams.height){
         setEmbedDimensions(urlParams.width, urlParams.height);
-        //setEmbedDimensions(960, 720);
       }
 
       if(['audio', 'video'].indexOf(mediaMode) > -1){
@@ -88,7 +87,7 @@ export const loadJSON = (jsonUrl, cb) => {
 
 export const setEmbedDimensions = (w, h) => {
   const dimensionCss = {'max-width': w + 'px', 'max-height': h + 'px' };
-  $('body').css(dimensionCss);
+  $('.europeana-media-embed').css(dimensionCss);
 };
 
 /*
@@ -122,7 +121,7 @@ export const initialiseAttribution = (manifestJsonld, mediaMode) => {
           <span class="fname">${name}</span>
           <span class="fvalue"
             ${name === 'Rights' ? 'property="cc:License"' : '' }
-          >${name === 'Title' ? manifestJsonld.label[Object.keys(manifestJsonld.label)[0]] :
+          >${name === 'Title' ? '<a data-name="title"></a>' :
             name === 'Institution' ? '<a href="http://europeana.eu" target="_blank" rel="noopener">' + name + ' goes here</a>' :
             name === 'Rights' ? generateRightsList() + `<a href="${testLicense}" target="_blank" rel="noopener">Copyright</a>` :
               name + ' goes here'}</span></span>`;
@@ -155,15 +154,22 @@ export const initialiseAttribution = (manifestJsonld, mediaMode) => {
 
   let attribution = $(htmlAttribution).appendTo($('.info'));
 
-  attribution.on('click', ()=> {
+  setLinkElementData($('[data-name=title]'), manifestJsonld);
+
+  attribution.on('click', (e) => {
+    if((e.target.nodeName.toUpperCase() === 'A')){
+      e.stopPropagation();
+      return;
+    }
     attribution.removeClass('showing');
   });
-  btnInfo.on('click', ()=> {
-    attribution.addClass('showing');
+
+  btnInfo.on('click', () => {
+    attribution.toggleClass('showing');
   });
 };
 
-export const setTitleLink = ($el, manifest) => {
+export const setLinkElementData = ($el, manifest) => {
   if(manifest.label) {
     const text = manifest.label[Object.keys(manifest.label)[0]];
     $el.text(text);
@@ -172,6 +178,8 @@ export const setTitleLink = ($el, manifest) => {
     let url = manifest.seeAlso[0].id;
     url = url.replace('api/v2', 'portal').replace('json-ld', 'html');
     $el.attr('href', url);
+    $el.attr('target', '_blank');
+    $el.attr('rel', 'noopener');
   }
 };
 
@@ -184,7 +192,7 @@ export const initialiseEmbed = (mediaMode) => {
 
   initialiseAttribution(manifestJsonld, mediaMode);
 
-  setTitleLink($('.title-link'), manifestJsonld);
+  setLinkElementData($('.title-link'), manifestJsonld);
   $('.logo-link').removeAttr('style');
 
   if (duration == -1 && manifestJsonld.items[0].duration) {
