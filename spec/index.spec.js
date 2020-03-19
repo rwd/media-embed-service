@@ -79,6 +79,30 @@ describe('index functions', () => {
     expect($('.info .attribution').hasClass('showing')).toBeFalsy();
   });
 
+  it('should set the title link', () => {
+    const url1 = 'http://www.europeana.eu/api/v2/record/abc/123.json-ld';
+    const url2 = 'http://www.europeana.eu/portal/record/abc/123.html';
+    const testTitle = 'Test Title';
+
+    const $titleLink = $('<a class="title-link"></a>');
+
+    expect($titleLink.text()).toBeFalsy();
+    expect($titleLink.attr('href')).toBeFalsy();
+
+    index.setTitleLink($titleLink, {});
+
+    expect($titleLink.text()).toBeFalsy();
+    expect($titleLink.attr('href')).toBeFalsy();
+
+    index.setTitleLink($titleLink, {
+      label: {en: [testTitle]},
+      seeAlso: [{ id: url1 }]
+    });
+
+    expect($titleLink.text()).toEqual(testTitle);
+    expect($titleLink.attr('href')).toEqual(url2);
+  });
+
   it('should set the dimensions', () => {
     const fixture = '<div class="player-wrapper loading"></div>';
     document.body.insertAdjacentHTML('afterbegin', fixture);

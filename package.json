@@ -8,9 +8,10 @@
     "test": "karma start"
   },
   "dependencies": {
-    "europeanamediaplayer": "^0.4.3",
+    "europeanamediaplayer": "^0.4.5",
     "materialize-css": "^1.0.0",
     "placeload.js": "^1.0.4",
+    "source-map-support": "^0.5.16",
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
@@ -22,8 +23,11 @@
     "css-loader": "^2.0.0",
     "expose-loader": "^0.7.5",
     "file-loader": "^4.2.0",
+    "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine-ajax": "^4.0.0",
     "jquery": "^3.4.1",
+    "karma-coverage": "^2.0.1",
+    "karma-sourcemap-loader": "^0.3.7",
     "mini-css-extract-plugin": "^0.9.0",
     "node-sass": "^4.13.1",
     "sass-loader": "^8.0.2",
