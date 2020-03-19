@@ -1,19 +1,65 @@
+const includeCoverage = true;
+
+const rules = () => {
+  const defaultRules = [
+    {
+      test: /\.js$/i,
+      exclude: /(node_modules)/,
+      loader: 'babel-loader',
+      options: {
+        //presets: ['@babel/preset-env']
+        presets: ['babel-preset-es2015']
+      }
+    },
+    {
+      test: /\.[s]?css$/,
+      exclude: /(node_modules)/,
+      loader: 'style-loader!css-loader!sass-loader'
+    }
+  ];
+  return includeCoverage ? defaultRules.concat([
+    {
+      enforce: 'pre',
+      test: /.spec\.js$/,
+      include: /spec/,
+      exclude: /node_modules/,
+      use: [{ loader: 'babel-loader' }]
+    },
+    {
+      enforce: 'pre',
+      test: /\.js$/,
+      include: /src/,
+      exclude: /node_modules/,
+      use: [{ loader: 'istanbul-instrumenter-loader', query: { esModules: true } }]
+    }
+  ]) : defaultRules;
+};
+
 module.exports = function (config) {
-  config.set({
+  let conf = {
     basePath: '',
     exclude: [],
     files: [
       { pattern: 'spec/*.js', watched: true, served: true, included: true },
       'https://code.jquery.com/jquery-3.4.1.min.js'
     ],
+    //.concat(
+    //  ['jpg', 'js', 'json', 'mp3', 'mp4'].map((ext) => {
+    //    return {
+    //      pattern:  `./spec/fixture-data/*.${ext}`,
+    //      included: false,
+    //      watched:  true,
+    //      served:   true
+    //    }
+    //  })
+    //),
     autoWatch: true,
     singleRun: false,
     failOnEmptyTestSuite: false,
     logLevel: config.LOG_WARN,
     frameworks: ['jasmine'],
     browsers: ['Chrome'/*,'PhantomJS','Firefox','Edge','ChromeCanary','Opera','IE','Safari'*/],
-    reporters: ['mocha', 'kjhtml'/*,'dots','progress','spec'*/],
-
+    reporters: includeCoverage ? ['progress', 'kjhtml', 'spec', 'coverage'] : ['kjhtml'],//, 'kjhtml', 'dots', ],
     //address that the server will listen on, '0.0.0.0' is default
     listenAddress: '0.0.0.0',
     //hostname to be used when capturing browsers, 'localhost' is default
@@ -44,37 +90,29 @@ module.exports = function (config) {
        eg. import, export keywords */
     webpack: {
       module: {
-        rules: [
-          {
-            test: /\.js$/i,
-            exclude: /(node_modules)/,
-            loader: 'babel-loader',
-            options: {
-              //presets: ['@babel/preset-env']
-              presets: ['babel-preset-es2015']
-            }
-          },
-          {
-            test: /\.[s]?css$/,
-            exclude: /(node_modules)/,
-            loader: 'style-loader!css-loader!sass-loader'
-          }
-        ]
+        rules: rules()
       }
     },
-    preprocessors: {
-      //add webpack as preprocessor to support require() in test-suits .js files
+    preprocessors: includeCoverage ? {
+      './spec/**/*.js': ['webpack', 'sourcemap'],
+      './src/**/*.js': ['webpack', 'sourcemap', 'coverage'],
+    } : {
       './spec/*.js': ['webpack']
     },
     webpackMiddleware: {
       //turn off webpack bash output when run the tests
       noInfo: true,
       stats: 'errors-only'
-    },
-
-    /*karma-mocha-reporter config*/
-    mochaReporter: {
-      output: 'noFailures'  //full, autowatch, minimal
     }
-  });
+  };
+
+  if(includeCoverage){
+    conf.coverageIstanbulReporter = {
+      dir : 'coverage/',
+      reports: [ 'html' ],
+      fixWebpackSourcePaths: true
+    };
+  }
+
+  config.set(conf);
 };

@@ -87,7 +87,8 @@ export const loadJSON = (jsonUrl, cb) => {
 };
 
 export const setEmbedDimensions = (w, h) => {
-  $('.player-wrapper').css({'max-width': w + 'px', 'max-height': h + 'px' });
+  const dimensionCss = {'max-width': w + 'px', 'max-height': h + 'px' };
+  $('body').css(dimensionCss);
 };
 
 /*
@@ -162,6 +163,17 @@ export const initialiseAttribution = (manifestJsonld, mediaMode) => {
   });
 };
 
+export const setTitleLink = ($el, manifest) => {
+  if(manifest.label) {
+    const text = manifest.label[Object.keys(manifest.label)[0]];
+    $el.text(text);
+  }
+  if(manifest.seeAlso && manifest.seeAlso.length > 0 && manifest.seeAlso[0].id){
+    let url = manifest.seeAlso[0].id;
+    url = url.replace('api/v2', 'portal').replace('json-ld', 'html');
+    $el.attr('href', url);
+  }
+};
 
 export const initialiseEmbed = (mediaMode) => {
 
@@ -172,12 +184,8 @@ export const initialiseEmbed = (mediaMode) => {
 
   initialiseAttribution(manifestJsonld, mediaMode);
 
-  //let manifestMetadata = manifestJsonld.metaData;
-  //let langCode = manifestMetadata.find(obj => obj.label.en[0] == "language").value[Object.keys(manifestMetadata.find(obj => obj.label.en[0] == "language").value)[0]][0];
-  if (manifestJsonld.label) {
-    $('.title').text(manifestJsonld.label[Object.keys(manifestJsonld.label)[0]]);
-    $('.logo').removeAttr('style');
-  }
+  setTitleLink($('.title-link'), manifestJsonld);
+  $('.logo-link').removeAttr('style');
 
   if (duration == -1 && manifestJsonld.items[0].duration) {
     duration = manifestJsonld.items[0].duration;

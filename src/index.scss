@@ -90,12 +90,15 @@ body{
       justify-content: space-between;
       display: flex;
     }
-    .logo {
-      display: block;
-      padding: $def-padding $def-padding 0 0;
-      max-width: 40px;
+    .logo-link{
+      pointer-events: all;
+      .logo{
+        display: block;
+        padding: $def-padding $def-padding 0 0;
+        max-width: 40px;
+      }
     }
-    .title {
+    .title-link {
       box-sizing: border-box;
       color: #fff;
       display: block;
@@ -103,8 +106,10 @@ body{
       font-weight: bold;
       line-height: 27px;
       overflow: hidden;
+      pointer-events: all;
       padding: 0 $def-padding;
       position: relative;
+      text-decoration: none;
       top: 0;
       transition: transform 0.4s ease 0s;
       transform: translateY(0);
@@ -116,14 +121,18 @@ body{
         text-overflow: unset;
         max-height: $title-height;
       }
+
+      &:hover{
+        text-decoration: underline;
+      }
     }
 
     &.playing{
-      .title{
+      .title-link{
         transform: translateY(calc(-100% - 20px ));
       }
       &:hover{
-        .title{
+        .title-link{
           top: 0;
         }
       }
