@@ -1,7 +1,6 @@
 $title-height: 54px;
 $def-padding: 16px;
 $mid-grey: #4b4b4b;
-// $min-width: 375px;
 
 $bp-med: 50em;
 $bp-large: 60em;
@@ -9,6 +8,7 @@ $bp-large: 60em;
 body{
   font-family: 'Open Sans', sans-serif;
   margin: 0;
+  min-width: 375px;
   padding: 0;
 }
 
@@ -61,11 +61,19 @@ body{
   }
 }
 
-.audio,
-.video{
-  .attribution{
-    bottom: $title-height;
-    right: $def-padding;
+.player-wrapper {
+  &.image{
+    .btn.btn-info:hover ~ .attribution,
+    .attribution:hover {
+      display: block;
+    }
+  }
+  &.audio,
+  &.video{
+    .attribution{
+      bottom: $title-height;
+      right: $def-padding;
+    }
   }
 }
 
@@ -139,6 +147,7 @@ body{
     }
 
     .options-container{
+      padding-right: $def-padding;
       transform: translateY(0);
     }
 
@@ -153,12 +162,8 @@ body{
         transform: translateY(calc(-100% - 20px));
       }
       &:hover{
-        .attribution{
-          transform: translateX(0);
-        }
-        .options-container{
-          transform: translateY(0);
-        }
+        .attribution,
+        .options-container,
         .title-link{
           transform: translateY(0);
         }
