@@ -79,7 +79,7 @@ describe('index functions', () => {
     expect($('.info .attribution').hasClass('showing')).toBeFalsy();
   });
 
-  it('should set the title link', () => {
+  it('should set link element data', () => {
     const url1 = 'http://www.europeana.eu/api/v2/record/abc/123.json-ld';
     const url2 = 'http://www.europeana.eu/portal/record/abc/123.html';
     const testTitle = 'Test Title';
@@ -89,12 +89,12 @@ describe('index functions', () => {
     expect($titleLink.text()).toBeFalsy();
     expect($titleLink.attr('href')).toBeFalsy();
 
-    index.setTitleLink($titleLink, {});
+    index.setLinkElementData($titleLink, {});
 
     expect($titleLink.text()).toBeFalsy();
     expect($titleLink.attr('href')).toBeFalsy();
 
-    index.setTitleLink($titleLink, {
+    index.setLinkElementData($titleLink, {
       label: {en: [testTitle]},
       seeAlso: [{ id: url1 }]
     });
@@ -104,11 +104,11 @@ describe('index functions', () => {
   });
 
   it('should set the dimensions', () => {
-    const fixture = '<div class="player-wrapper loading"></div>';
+    const fixture = '<div class="europeana-media-embed"></div>';
     document.body.insertAdjacentHTML('afterbegin', fixture);
-    expect($('.player-wrapper').attr('style')).toBeFalsy();
+    expect($('.europeana-media-embed').attr('style')).toBeFalsy();
     index.setEmbedDimensions(1, 2);
-    expect($('.player-wrapper').attr('style')).toBeTruthy();
+    expect($('.europeana-media-embed').attr('style')).toBeTruthy();
   });
 
 });

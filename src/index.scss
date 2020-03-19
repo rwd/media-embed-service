@@ -9,23 +9,21 @@ $bp-large: 60em;
 body{
   font-family: 'Open Sans', sans-serif;
   margin: 0;
-  // min-width: $min-width;
   padding: 0;
 }
 
 .attribution{
   background: #fff;
   border: 1px solid $mid-grey;
-  bottom: 0;
+  border-radius: 4px;
   color: #000;
   display: none;
   font-size: 14px;
   max-width: 375px;
   padding: $def-padding;
   pointer-events: all;
-
   position: absolute;
-  right: 0;
+  transform: translateX(0);
   z-index: 1;
 
   .field{
@@ -66,8 +64,22 @@ body{
 .audio,
 .video{
   .attribution{
-    bottom: 46px;
+    bottom: $title-height;
+    right: $def-padding;
   }
+}
+
+.image{
+  .attribution{
+    bottom: 8px;
+    right: 8px;
+  }
+}
+
+.attribution,
+.options-container,
+.title-link{
+  transition: transform 0.4s ease 0s;
 }
 
 .player-wrapper {
@@ -111,7 +123,6 @@ body{
       position: relative;
       text-decoration: none;
       top: 0;
-      transition: transform 0.4s ease 0s;
       transform: translateY(0);
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -127,13 +138,29 @@ body{
       }
     }
 
+    .options-container{
+      transform: translateY(0);
+    }
+
     &.playing{
+      .attribution{
+        transform: translateX(calc(100% + 20px));
+      }
+      .options-container{
+        transform: translateY(calc(100% + 20px));
+      }
       .title-link{
-        transform: translateY(calc(-100% - 20px ));
+        transform: translateY(calc(-100% - 20px));
       }
       &:hover{
+        .attribution{
+          transform: translateX(0);
+        }
+        .options-container{
+          transform: translateY(0);
+        }
         .title-link{
-          top: 0;
+          transform: translateY(0);
         }
       }
     }
@@ -177,10 +204,10 @@ body{
   }
 
   &.image .btn.btn-info{
-    bottom: 16px;
+    bottom: $def-padding;
     pointer-events: all;
     position: absolute;
-    right: 16px;
+    right: $def-padding;
   }
 
 }
