@@ -39,7 +39,7 @@ window.addEventListener('load', () => {
       manifest = urlParams.manifest;
 
       if(urlParams.width && urlParams.height){
-        setEmbedDimensions(urlParams.width, urlParams.height);
+        setEmbedDimensions(urlParams.width, urlParams.height, mediaMode === 'image');
       }
 
       if(['audio', 'video'].indexOf(mediaMode) > -1){
@@ -85,10 +85,13 @@ export const loadJSON = (jsonUrl, cb) => {
   });
 };
 
-export const setEmbedDimensions = (w, h) => {
+export const setEmbedDimensions = (w, h, noRatio) => {
   const dimensionCss = {'max-width': w + 'px', 'max-height': h + 'px' };
   $('.europeana-media-embed').css(dimensionCss);
-  $('.player-wrapper').css('padding-top', `${(h / w) * 100}%`);
+  if(!noRatio){
+    const pct = (h / w) * 100;
+    $('.player-wrapper').css('padding-top', `${pct}%`);
+  }
 };
 
 /*
@@ -239,12 +242,16 @@ function getSubtitles() {
 export const initialisePlayer = (playerWrapper, mediaUrl, mediaMode) => {
   let p = new EuropeanaMediaPlayer(playerWrapper, {manifest: mediaUrl}, {mode: "player", manifest: mediaUrl});
   player = p.player;
+
   player.avcomponent.on('mediaerror', function() {
     console.log('mediaerror (reinit)')
     initialiseEmbed(mediaMode);
   });
   player.avcomponent.on('mediaready', function() {
     console.log('mediaready (reinit)')
+    if(mediaMode === 'audio'){
+      $('.eups-player').removeAttr('style');
+    }
     initialiseEmbed(mediaMode);
   });
   player.avcomponent.on('play', () => {
