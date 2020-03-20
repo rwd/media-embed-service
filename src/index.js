@@ -88,6 +88,7 @@ export const loadJSON = (jsonUrl, cb) => {
 export const setEmbedDimensions = (w, h) => {
   const dimensionCss = {'max-width': w + 'px', 'max-height': h + 'px' };
   $('.europeana-media-embed').css(dimensionCss);
+  $('.player-wrapper').css('padding-top', `${(h / w) * 100}%`);
 };
 
 /*
