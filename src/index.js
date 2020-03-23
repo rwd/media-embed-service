@@ -45,8 +45,12 @@ window.addEventListener('load', () => {
       if(['audio', 'video'].indexOf(mediaMode) > -1){
         initialisePlayer($('.player-wrapper'), manifest, mediaMode);
       }
-      else{
-        if(mediaMode === 'image'){
+      else if(mediaMode === 'image'){
+        const rootItem = manifestData.items[0];
+        const imgUrl = rootItem.items[0].items[0].body.id;
+        const xywh = urlParams.xywh ? urlParams.xywh.split(',').map((i) => parseInt(i)) : null;
+
+        if(!(xywh && applyXYWH(imgUrl, rootItem.width, rootItem.height, ...xywh, urlParams.height))){
           $('.player-wrapper').append(`<img src="${manifestData.items[0].items[0].items[0].body.id}">`);
         }
         $('.player-wrapper').removeClass('loading');
@@ -67,6 +71,41 @@ window.addEventListener('load', () => {
     }
   }
 });
+
+export const applyXYWH = (imgUrl, imgW, imgH, x, y, w, h, cmpHeight) => {
+  if((x < 0 || y < 0 || w < 1 || h < 1 || (x + w) > imgW || (y + h) > imgH)){
+    console.log('Invalid xywh parameters');
+    return false;
+  }
+
+  const getOffset = (imgD, d, pos) => {
+    if(pos === 0){
+      return 0;
+    }
+    let remainFraction = (imgD / d) -1;
+    let remainPosition = pos / d;
+    return (remainPosition / remainFraction) * 100;
+  };
+
+  // position & scale background
+
+  let offsetX = getOffset(imgW, w, x);
+  let offsetY = getOffset(imgH, h, y);
+
+  $('.player-wrapper').append('<div class="xywh-img-wrapper"><div class="xywh-img"'
+   + ' style="'
+   + 'background-image: url(' + imgUrl + '); '
+   + 'background-size: ' + ((imgW / w) * 100)  + '%; '
+   + 'background-position: ' + offsetX + '% ' + offsetY +  '%; '
+   + 'padding-top: ' + ((h/w)*100) + '%;'
+   + '"></div></div>');
+
+   if(h > w){
+     $('.xywh-img-wrapper').css('max-width', ((w/h) * cmpHeight) + 'px');
+   }
+   return true;
+}
+
 
 export const loadJSON = (jsonUrl, cb) => {
 
