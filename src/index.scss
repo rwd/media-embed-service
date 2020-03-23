@@ -14,7 +14,6 @@ body{
 
 .attribution{
   background: #fff;
-  border: 1px solid $mid-grey;
   border-radius: 4px;
   color: #000;
   display: none;
@@ -215,20 +214,8 @@ body{
     position: absolute;
     right: $def-padding;
   }
-}
 
-.xywh-img{
-  width: 100%;
 }
-
-.xywh-img-wrapper{
-  align-content: center;
-  display: flex;
-  justify-content: center;
-  margin: auto;
-  position: relative;
-}
-
 
 @keyframes placeHolderShimmer{
   0%{

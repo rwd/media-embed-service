@@ -100,9 +100,9 @@ export const applyXYWH = (imgUrl, imgW, imgH, x, y, w, h, cmpHeight) => {
    + 'padding-top: ' + ((h/w)*100) + '%;'
    + '"></div></div>');
 
-   if(h > w){
-     $('.xywh-img-wrapper').css('max-width', ((w/h) * cmpHeight) + 'px');
-   }
+   //if(h > w){
+   //  $('.xywh-img-wrapper').css('max-width', ((w/h) * cmpHeight) + 'px');
+   //}
    return true;
 }
 
