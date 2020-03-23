@@ -14,7 +14,6 @@ body{
 
 .attribution{
   background: #fff;
-  border: 1px solid $mid-grey;
   border-radius: 4px;
   color: #000;
   display: none;
@@ -96,6 +95,7 @@ body{
   overflow: hidden;
 
   &.image > img{
+    display: block;
     max-width: 100%;
     max-width: 100%;
   }
