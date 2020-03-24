@@ -186,18 +186,15 @@ body{
   }
 
   .btn.btn-info{
-    background-image: url('/ic-info.png');
-    background-repeat: no-repeat;
-    opacity: 70%;
+    fill: rgba(255, 255, 255, 0.7);
     cursor: pointer;
     display: inline-block;
     font-size: 24px;
     height: 1em;
-    margin-top: 5px;
     width: 1em;
 
     &:hover{
-      opacity: 100%;
+      fill: rgba(255, 255, 255, 1);
     }
   }
 
