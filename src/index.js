@@ -48,9 +48,8 @@ window.addEventListener('load', () => {
       else if(mediaMode === 'image'){
         const rootItem = manifestData.items[0];
         const imgUrl = rootItem.items[0].items[0].body.id;
-        const xywh = urlParams.xywh ? urlParams.xywh.split(',').map((i) => parseInt(i)) : null;
-
-        if(!(xywh && applyXYWH(imgUrl, rootItem.width, rootItem.height, ...xywh, urlParams.height))){
+        const xywhParam = urlParams.xywh;
+        if(!(xywhParam && handleMediaFragment(imgUrl, rootItem.width, rootItem.height, urlParams))){
           $('.player-wrapper').append(`<img src="${manifestData.items[0].items[0].items[0].body.id}">`);
         }
         $('.player-wrapper').removeClass('loading');
@@ -72,43 +71,87 @@ window.addEventListener('load', () => {
   }
 });
 
-export const applyXYWH = (imgUrl, imgW, imgH, x, y, w, h, cmpHeight) => {
-  if((x < 0 || y < 0 || w < 1 || h < 1 || (x + w) > imgW || (y + h) > imgH)){
+export const handleMediaFragment = (imgUrl, imgW, imgH, urlParams) => {
+
+  const noramlisedParam = urlParams.xywh.replace(/percent:/, '');
+  const isPercent = noramlisedParam !== urlParams.xywh;
+  const xywh = noramlisedParam.split(',').map((i) => parseInt(i));
+
+  if(!isValidXYWH(isPercent, imgW, imgH, ...xywh)){
     console.log('Invalid xywh parameters');
     return false;
   }
 
-  const getOffset = (imgD, d, pos) => {
-    if(pos === 0){
-      return 0;
-    }
-    let remainFraction = (imgD / d) -1;
-    let remainPosition = pos / d;
-    return (remainPosition / remainFraction) * 100;
-  };
+  let dimensions;
 
-  // position & scale background
-
-  let offsetX = getOffset(imgW, w, x);
-  let offsetY = getOffset(imgH, h, y);
+  if(isPercent){
+    dimensions = getFragmentPercent(imgW, imgH, ...xywh);
+  }
+  else{
+    dimensions = getFragmentPixel(imgW, imgH, ...xywh, urlParams.height);
+  }
 
   $('.player-wrapper').append('<div class="xywh-img-wrapper"><div class="xywh-img"'
    + ' style="'
    + 'background-image: url(' + imgUrl + '); '
-   + 'background-size: ' + ((imgW / w) * 100)  + '%; '
-   + 'background-position: ' + offsetX + '% ' + offsetY +  '%; '
-   + 'padding-top: ' + ((h/w)*100) + '%;'
+   + 'background-size: ' + dimensions.size  + '%; '
+   + 'background-position: ' + dimensions.position.x + '% ' + dimensions.position.y +  '%; '
+   + 'padding-top: ' + dimensions.top + '%;'
    + '"></div></div>');
+  return true;
+};
 
-   //if(h > w){
-   //  $('.xywh-img-wrapper').css('max-width', ((w/h) * cmpHeight) + 'px');
-   //}
-   return true;
+export const isValidXYWH = (pct, imgW, imgH, x, y, w, h) => {
+  let result = true;
+  if(pct && (x < 0 || y < 0 || w < 1 || h < 1 || (x + w) > 100 || (y + h) > 100 || x > 100 || y > 100)){
+    result = false;
+  }
+  else if((x < 0 || y < 0 || w < 1 || h < 1 || (x + w) > imgW || (y + h) > imgH)){
+    result = false;
+  }
+  return result;
+};
+
+export const getOffsetPixels = (imgD, d, pos) => {
+  if(pos === 0){
+    return 0;
+  }
+  let remainFraction = (imgD / d) -1;
+  let remainPosition = pos / d;
+  return (remainPosition / remainFraction) * 100;
+};
+
+export const getOffsetPercent = (pos, d) => {
+  let bgScale = 100 / d;
+  let numerator = bgScale * pos;
+  let denominator = bgScale - 1;
+  return [numerator, denominator].indexOf(0) > -1 ? 0 : numerator / denominator;
+};
+
+export const dimensionData = (size, x, y, top) => {
+  return {
+    size: size,
+    position: {
+      x: x,
+      y: y
+    },
+    top: top
+  };
+};
+
+export const getFragmentPercent = (imgW, imgH, x, y, w, h) => {
+  const wRatio = 100 / w;
+  let realPct = 100 / (imgW / imgH);
+  let cropRatio = (realPct / 100) * h;
+  let paddingTop = cropRatio * wRatio;
+  return dimensionData(wRatio * 100, getOffsetPercent(x, w), getOffsetPercent(y, h), paddingTop);
+};
+
+export const getFragmentPixel = (imgW, imgH, x, y, w, h, cmpHeight) => {
+   return dimensionData(((imgW / w) * 100), getOffsetPixels(imgW, w, x), getOffsetPixels(imgH, h, y), (h/w) * 100);
 }
 
-
 export const loadJSON = (jsonUrl, cb) => {
-
   fetch(jsonUrl, {
     mode: 'cors',
     method: 'GET',
