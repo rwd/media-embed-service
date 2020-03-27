@@ -27,19 +27,19 @@ var playing = false;
 
 window.addEventListener('load', () => {
 
-  const urlParams = getAllUrlParams(window.location.href);
+  const urlParams = new URL(window.location.href).searchParams;
 
-  if(urlParams.manifest){
+  if(urlParams.get('manifest')){
 
-    loadJSON(urlParams.manifest, (manifestData) => {
+    loadJSON(urlParams.get('manifest'), (manifestData) => {
 
       let mediaMode = manifestData.items[0].items[0].items[0].body.type.toLowerCase();
       $('.player-wrapper').addClass(mediaMode);
 
-      manifest = urlParams.manifest;
+      manifest = urlParams.get('manifest');
 
-      if(urlParams.width && urlParams.height){
-        setEmbedDimensions(urlParams.width, urlParams.height, mediaMode === 'image');
+      if(urlParams.get('width') && urlParams.get('height')){
+        setEmbedDimensions(urlParams.get('width'), urlParams.get('height'), mediaMode === 'image');
       }
 
       if(['audio', 'video'].indexOf(mediaMode) > -1){
@@ -48,7 +48,7 @@ window.addEventListener('load', () => {
       else if(mediaMode === 'image'){
         const rootItem = manifestData.items[0];
         const imgUrl = rootItem.items[0].items[0].body.id;
-        const xywhParam = urlParams.xywh;
+        const xywhParam = urlParams.get('xywh');
         if(!(xywhParam && handleMediaFragment(imgUrl, rootItem.width, rootItem.height, urlParams))){
           $('.player-wrapper').append(`<img src="${manifestData.items[0].items[0].items[0].body.id}">`);
         }
@@ -61,10 +61,10 @@ window.addEventListener('load', () => {
     console.log('no manifest supplied');
   }
 
-  if (urlParams.t !== undefined) {
-    //options.temporal = urlParams.t;
+  if (urlParams.get('t') !== undefined) {
+    //options.temporal = urlParams.get('t');
     //construct start and duration of the temporal fragment
-    let parts = urlParams.t.split(',');
+    let parts = urlParams.get('t').split(',');
     if(split.length > 1){
       duration = parts[1] - parts[0];
     }
@@ -73,8 +73,8 @@ window.addEventListener('load', () => {
 
 export const handleMediaFragment = (imgUrl, imgW, imgH, urlParams) => {
 
-  const noramlisedParam = urlParams.xywh.replace(/percent:/, '');
-  const isPercent = noramlisedParam !== urlParams.xywh;
+  const noramlisedParam = urlParams.get('xywh').replace(/percent:/, '');
+  const isPercent = noramlisedParam !== urlParams.get('xywh');
   const xywh = noramlisedParam.split(',').map((i) => parseInt(i));
 
   if(!isValidXYWH(isPercent, imgW, imgH, ...xywh)){
@@ -88,7 +88,7 @@ export const handleMediaFragment = (imgUrl, imgW, imgH, urlParams) => {
     dimensions = getFragmentPercent(imgW, imgH, ...xywh);
   }
   else{
-    dimensions = getFragmentPixel(imgW, imgH, ...xywh, urlParams.height);
+    dimensions = getFragmentPixel(imgW, imgH, ...xywh, urlParams.get('height'));
   }
 
   $('.player-wrapper').append('<div class="xywh-img-wrapper"><div class="xywh-img"'
@@ -346,57 +346,3 @@ export const initialisePlayer = (playerWrapper, mediaUrl, mediaMode) => {
     playerWrapper.removeClass('playing');
   });
 }
-
-export const getAllUrlParams = (url) => {
-  // get query string from url (optional) or window
-  let queryString = url ? url.split('?')[1] : window.location.search.slice(1);
-  let obj = {};
-  if (queryString) {
-
-    // remove hash param
-    queryString = queryString.split('#')[0];
-
-    var arr = queryString.split('&');
-
-    for (var i = 0; i < arr.length; i++) {
-      // separate the keys and the values
-      var a = arr[i].split('=');
-
-      // set parameter name and value (use 'true' if empty)
-      var paramName = a[0];
-      var paramValue = typeof (a[1]) === 'undefined' ? true : decodeURIComponent(a[1]);
-
-      // if the paramName ends with square brackets, e.g. colors[] or colors[2]
-      if (paramName.match(/\[(\d+)?\]$/)) {
-
-        // create key if it doesn't exist
-        var key = paramName.replace(/\[(\d+)?\]/, '');
-        if (!obj[key]) obj[key] = [];
-
-        // if it's an indexed array e.g. colors[2]
-        if (paramName.match(/\[\d+\]$/)) {
-          // get the index value and add the entry at the appropriate position
-          var index = /\[(\d+)\]/.exec(paramName)[1];
-          obj[key][index] = paramValue;
-        } else {
-          // otherwise add the value to the end of the array
-          obj[key].push(paramValue);
-        }
-      } else {
-        // we're dealing with a string
-        if (!obj[paramName]) {
-          // if it doesn't exist, create property
-          obj[paramName] = paramValue;
-        } else if (obj[paramName] && typeof obj[paramName] === 'string'){
-          // if property does exist and it's a string, convert it to an array
-          obj[paramName] = [obj[paramName]];
-          obj[paramName].push(paramValue);
-        } else {
-          // otherwise add the property
-          obj[paramName].push(paramValue);
-        }
-      }
-    }
-  }
-  return obj;
-};

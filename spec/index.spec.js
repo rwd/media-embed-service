@@ -161,20 +161,6 @@ describe('index functions', () => {
 
   });
 
-  it('should get the url parameters', () => {
-    const tParams = '25,33';
-    let testUrl = `http://video-embed?t=${tParams}`;
-    let params = index.getAllUrlParams(testUrl);
-
-    expect(params.t).toEqual(tParams);
-
-    let manifestUrl = 'https://iiif.europeana.eu//presentation//08609//fe9c5449_9522_4a70_951b_ef0b27893ae9//manifest?format=3&wskey=api2demo';
-    testUrl = 'localhost:9001?manifest=' + encodeURIComponent(manifestUrl);
-    params = index.getAllUrlParams(testUrl);
-
-    expect(params.manifest).toEqual(manifestUrl);
-  });
-
   it('should load JSON (on load)', (done) => {
 
     const doneFn = jasmine.createSpy('success');
