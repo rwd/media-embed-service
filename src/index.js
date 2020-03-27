@@ -154,8 +154,7 @@ export const getFragmentPixel = (imgW, imgH, x, y, w, h, cmpHeight) => {
 export const loadJSON = (jsonUrl, cb) => {
   fetch(jsonUrl, {
     mode: 'cors',
-    method: 'GET',
-    headers: { "Content-Type": "application/json; charset=utf-8" }
+    method: 'GET'
   })
   .then(res => res.json())
   .then(response => {
