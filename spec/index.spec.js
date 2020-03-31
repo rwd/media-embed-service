@@ -7,6 +7,8 @@ const $ = require("jquery");
 describe('index functions', () => {
 
   let originalFetch;
+  const attributionJSON = {"requiredStatement": { "en": ["<div class=\"attribution\">text</div>"]}};
+
 
   beforeEach(function() {
     // mock window.fetch (see here: https://www.damirscorner.com/blog/posts/20200110-MockingFetchCallsWithJasmine.html)
@@ -210,14 +212,14 @@ describe('index functions', () => {
     expect($('.info .attribution').length).toBeFalsy();
     expect($('.info .btn-info').length).toBeFalsy();
 
-    index.initialiseAttribution({attribution: { en: '<dic class="attribution">text</div>'}});
+    index.initialiseAttribution(attributionJSON, 'image');
 
     expect($('.info .attribution').length).toBeTruthy();
     expect($('.info .btn-info').length).toBeTruthy();
   });
 
   it('should show and hide the attribution', () => {
-    index.initialiseAttribution({attribution: { en: '<dic class="attribution">text</div>'}});
+    index.initialiseAttribution(attributionJSON, 'image');
 
     expect($('.info .attribution').hasClass('showing')).toBeFalsy();
     $('.info .btn-info').click();
