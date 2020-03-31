@@ -16,7 +16,7 @@ const config = function (mode) {
           use: {
             loader: 'babel-loader',
             options: {
-              presets: ["babel-preset-es2015"].map(require.resolve)
+              presets: ["babel-preset-env"].map(require.resolve)
             },
           }
         },

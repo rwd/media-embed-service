@@ -5,11 +5,7 @@ const rules = () => {
     {
       test: /\.js$/i,
       exclude: /(node_modules)/,
-      loader: 'babel-loader',
-      options: {
-        //presets: ['@babel/preset-env']
-        presets: ['babel-preset-es2015']
-      }
+      loader: 'babel-loader'
     },
     {
       test: /\.[s]?css$/,

@@ -186,14 +186,19 @@ export const loadVideo = () => {
 */
 
 export const initialiseAttribution = (manifestJsonld, mediaMode) => {
+  if(!manifestJsonld.requiredStatement && !manifestJsonld.requiredStatement.en[0]){
+    console.log('(no attribution found)');
+    return;
+  }
 
   let svgData = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>';
-  let htmlAttribution = manifestJsonld.attribution.en;
-  let btnInfo         = $('<span class="btn btn-info">' + svgData + '</span>').appendTo(
-    ['audio', 'video'].indexOf(mediaMode) > -1 ? $('.controls-container') : $('.info')
-  );
+  let htmlAttribution = manifestJsonld.requiredStatement.en[0];
+
+  let btnInfoEl = $('<span class="btn btn-info">' + svgData + '</span>');
+  let btnInfo = mediaMode === 'image' ? btnInfoEl.appendTo($('.info')) : btnInfoEl.insertAfter($('.time-display'));
 
   // TODO: temp code until API supplies this markup
+  /*
   if(typeof htmlAttribution !== 'string'){
     const generateRightsList = () => {
       let rightItems = ['cc', 'by', 'sa'].map((key) => `<li class="icon-${key}"></li>`).join('');
@@ -214,32 +219,41 @@ export const initialiseAttribution = (manifestJsonld, mediaMode) => {
               name + ' goes here'}</span></span>`;
     }).join('');
     htmlAttribution = `<div class="attribution" about="${about}">${htmlAttribution}</div>`;
-    htmlAttribution = `<style type="text/css">
-      @import url('/icons/style.css');
-      .field:not(:last-child)::after{
-        content: ', ';
-      }
-      .fname{
-        display: none;
-      }
-      .rights-list{
-        display: inline;
-        list-style: none;
-        margin: 0;
-        padding: 0;
-      }
-      .rights-list li{
-        display: inline;
-        margin-right: 4px;
-      }
-      .rights-list li a{
-        text-transform: uppercase;
-      }
-      </style>` + htmlAttribution;
   }
+  */
   // end temp code
 
-  let attribution = $(htmlAttribution).appendTo($('.info'));
+  let attribution = $(htmlAttribution).addClass('attribution').appendTo($('.info'));
+
+  attribution.append(`<style type="text/css">
+    @import url('/icons/style.css');
+    .field:not(:last-child)::after{
+      content: ', ';
+    }
+    .fname{
+      display: none;
+    }
+    .rights-list{
+      display: inline;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .rights-list li{
+      display: inline;
+      margin-right: 4px;
+    }
+    .rights-list li a{
+      text-transform: uppercase;
+    }
+    </style>`);
+
+  const rightsList = $('<ul class="rights-list"></ul>').appendTo(attribution);
+
+  attribution.find('[rel="xhv:license http://www.europeana.eu/schemas/edm/rights"]').each((i, el) => {
+    $(el).appendTo(rightsList);
+    $(el).wrap('<li>');
+  });
 
   setLinkElementData($('[data-name=title]'), manifestJsonld);
 

@@ -147,7 +147,6 @@ body{
     }
 
     .options-container{
-      padding-right: $def-padding;
       transform: translateY(0);
     }
 
@@ -191,17 +190,12 @@ body{
     display: inline-block;
     font-size: 24px;
     height: 1em;
+    line-height: 1em;
+    order: 1;
     width: 1em;
 
     &:hover{
       fill: rgba(255, 255, 255, 1);
-    }
-  }
-
-  &.audio,
-  &.video{
-    .iiif-av-component .controls-container .btn.btn-info{
-      float: right;
     }
   }
 
