@@ -70,7 +70,7 @@ body{
   &.audio,
   &.video{
     .attribution{
-      bottom: $title-height;
+      bottom: 60px;
       right: $def-padding;
     }
   }
